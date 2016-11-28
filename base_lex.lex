@@ -85,6 +85,7 @@ fsi			 { return new Symbol(sym.FINSI);}
 {finligne} 		 { return new Symbol(sym.FINLIGNE);} 
 {retour_ligne}		 {}
 
+
 // qqs exemples de règles de détection d'erreurs lexicales...
 {erreur_ident} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => syntaxe identificateur non respectee ! "); }
 
