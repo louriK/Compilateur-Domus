@@ -1,9 +1,10 @@
-// Specification JFlex
-import java_cup.runtime.Symbol;
+
 
 %%
+%class lexer
 %unicode
-%cup
+%int
+%standalone		//debug ou standalone
 %line
 %column
 
@@ -21,85 +22,79 @@ import java_cup.runtime.Symbol;
 
 // qqs exemples de macros...
 chiffre = [0-9]
-entier = {chiffre}+
-identificateur = [a-zA-Z0-9]+
+identificateur = [a-zA-Z0-9\_]+
 annee = {chiffre}{chiffre}{chiffre}{chiffre}|\_
 mois = {chiffre}{chiffre}|{chiffre}|\_
 jour = {chiffre}{chiffre}|{chiffre}|\_
 heure = {chiffre}{chiffre}|{chiffre}|\_
 minutes = {chiffre}{chiffre}| {chiffre}|\_
-date = (annee, mois, jour, heure, minutes) 
-caractere = [a-zA-Z]
-chaine_de_car = {caractere}+
+date = ({annee},{mois},{jour},{heure},{minutes}) 
 autre_appareil = tv|hifi|cafetiere|video_proj|lave_vaisselle|lave_linge|seche_linge|ordinateur|portail
-appareil = eclairage|volet|chauffage|alarme|fenetre|autre_appareil({autre_appareil})
+appareil = eclairage|volet|chauffage|alarme|fenetre|autre\_appareil\({autre_appareil}\)
 interface = interrupteur|mobile|telephone|telecommande|tablette
-comparateur = "=="|"<="|">="|"!="
-fonction_etat = \.ouvrir|\.fermer |\.eteindre|\.allumer|\.tamiser|\.etat|\.allumer_partiel|\.allumer_eco|\.ouvrir_partiel|\.fermer_partiel
+operateur = "=="|"<="|">="|"!=" | "||" | "&&"
+fonction_etat = ouvrir|fermer|eteindre|allumer|tamiser|etat|allumer_partiel|allumer_eco|ouvrir_partiel|fermer_partiel
 etat = eteint|demi|eco|ouvvert|ferme
 espace = [\ \b\t]+
-finligne = [.;]
 retour_ligne = \n
 commentaire = \/\/ ~\n
-texte = \" ~\" 
-
-erreur_ident = [0-9]+[a-zA-Z]+
+texte = \" ~ \"
 erreur_chaine = \"[^\"\n]*\n  
 
 %%
-// qqs exemples de règles lexicales légales...
-{entier} 		 	{ return new Symbol(sym.ENTIER, new Integer(yytext())); }
-{identificateur} 	 	{ return new Symbol(sym.IDENTIFICATEUR, yytext()); }
-{date}				{ return new Symbol(sym.DATE,yytext());}
-{appareil}			{ return new Symbol(sym.APPAREIL, yytext());}
-{interface}			{ return new Symbol(sym.INTERFACE, yytext());}
-{comparateur}			{ return new Symbol(sym.COMPARATEUR, yytext());}
-{fonction_etat}			{ return new Symbol(sym.FONCTION_ETAT, yytext());}
-{etat}				{ return new Symbol(sym.ETAT, yytext());}
+// qqs exemples de r�gles lexicales l�gales...
+{date}				{return new Symbol(sym.DATE,yytext());}
+{appareil}			{return new Symbol(sym.APPAREIL, yytext());}
+{interface}			{return new Symbol(sym.INTERFACE, yytext());}
+{operateur}			{return new Symbol(sym.OPERATEUR, yytext());}
+{fonction_etat}			{return new Symbol(sym.FONCTION_ETAT, yytext());}
+{etat}				{return new Symbol(sym.ETAT, yytext());}
 {espace} 			{}
-{finligne} 			{ return new Symbol(sym.FINLIGNE, yytext()));} 
 {retour_ligne}			{}
 {commentaire}			{}
 {texte}				{ return new Symbol(sym.TEXTE, yytext());}
 
-"<PROGRAMME_DOMUS>"	 	{ return new Symbol(sym.DEBUT_DOMUS); }
-"</PROGRAMME_DOMUS>"	 	{ return new Symbol(sym.FIN_DOMUS); }
-"<DECLARATION_APPAREILS>"	{ return new Symbol(sym.DEBUT_APPAREIL); }
-"</DECLARATION_APPAREILS>" 	{ return new Symbol(sym.FIN_APPAREIL); }
-"<DECLARATION_INTERFACES>" 	{ return new Symbol(sym.DEBUT_INTERFACES);}
-"</DECLARATION_INTERFACES>"	{ return new Symbol(sym.FIN_INTERFACES);} 
-"<DECLARATION_SCENARII>"	{ return new Symbol(sym.DEBUT_SCENARII); }
-"</DECLARATION_SCENARII>"	{ return new Symbol(sym.FIN_SCENARII); }
-"<SCENARIO>"		 	{ return new Symbol(sym.DEBUT_SCENARIO); }
-"</SCENARIO>"		 	{ return new Symbol(sym.FIN_SCENARIO); }
-"<DECLARATIONS_COMMANDES>" 	{ return new Symbol(sym.DEBUT_COMMANDES); }
-"</DECLARATIONS_COMMANDES>"	{ return new Symbol(sym.FIN_COMMANDES); }
-definir			 	{ return new Symbol(sym.ENUM);}
-exectuer_scenario	 	{ return new Symbol(sym.EXECUTER_SCENARIO);}
-associer		 	{ return new Symbol(sym.ASSOCIER);}
-programmer		 	{ return new Symbol(sym.PROGRAMMER);}
-message			 	{ return new Symbol(sym.MESSAGE);}
-pourtout		 	{ return new Symbol(sym.POURTOUT);}
-si			 	{ return new Symbol(sym.SI);}
-alors			 	{ return new Symbol(sym.ALORS);}
-sinon			 	{ return new Symbol(sym.SINON);}
-fsi			 	{ return new Symbol(sym.FINSI);}
-","			 	{ return new Symbol(sym.VIRGULE);}
-"{"			 	{ return new Symbol(sym.ACOUVRE);}	
-"}"			 	{ return new Symbol(sym.ACFERME);}		 
-\"			 	{ return new Symbol(sym.GUILLEMET);}
-"="				{ return new Symbol(sym.ASSIGNATION);}
-":" 				{ return new Symbol(sym.PARCOURS);}
-"("				{ return new Symbol(sym.PAROUVRE);}
-")"				{ return new Symbol(sym.PARFERME);}
-"||"				{ return new Symbol(sym.OU);}
-"&&"				{ return new Symbol(sym.ET);}
+"<PROGRAMME_DOMUS>"	 	{return new Symbol(sym.DEBUT_DOMUS);}
+"</PROGRAMME_DOMUS>"	 	{return new Symbol(sym.FIN_DOMUS);}
+"<DECLARATION_APPAREILS>"	{return new Symbol(sym.DEBUT_APPAREIL);}
+"</DECLARATION_APPAREILS>" 	{return new Symbol(sym.FIN_APPAREIL);}
+"<DECLARATION_INTERFACES>" 	{return new Symbol(sym.DEBUT_INTERFACES);}
+"</DECLARATION_INTERFACES>"	{return new Symbol(sym.FIN_INTERFACES);} 
+"<DECLARATION_SCENARII>"	{return new Symbol(sym.DEBUT_SCENARII);}
+"</DECLARATION_SCENARII>"	{return new Symbol(sym.FIN_SCENARII);}
+"<DECLARATION_COMMANDES>" 	{return new Symbol(sym.DEBUT_COMMANDES);}
+"</DECLARATION_COMMANDES>"	{return new Symbol(sym.FIN_COMMANDES); }
+"<SCENARIO"			{return new Symbol(sym.DEBUT_SCENARIO);}
+"</SCENARIO"			{return new Symbol(sym.FIN_SCENARIO);}
+"<"				{return new Symbol(sym.INFERIEUR);}
+">"				{return new Symbol(sym.SUPERIEUR);}
+definir			 	{return new Symbol(sym.ENUM);}
+executer_scenario	 	{return new Symbol(sym.EXECUTER_SCENARIO);}
+associer		 	{return new Symbol(sym.ASSOCIER);}
+programmer		 	{return new Symbol(sym.PROGRAMMER);}
+message			 	{return new Symbol(sym.MESSAGE);}
+pourtout		 	{return new Symbol(sym.POURTOUT);}
+si			 	{return new Symbol(sym.SI);}
+alors			 	{return new Symbol(sym.ALORS);}
+sinon			 	{return new Symbol(sym.SINON);}
+faire			 	{return new Symbol(sym.FAIRE);}
+fait				{return new Symbol(sym.FAIT);}
+fsi			 	{return new Symbol(sym.FINSI);}
+","			 	{return new Symbol(sym.VIRGULE);}
+"{"			 	{return new Symbol(sym.ACOUVRE);}	
+"}"			 	{return new Symbol(sym.ACFERME);}		 
+\"			 	{return new Symbol(sym.GUILLEMET);}
+"="				{return new Symbol(sym.ASSIGNATION);}
+":" 				{return new Symbol(sym.PARCOURS);}
+"("				{return new Symbol(sym.PAROUVRE);}
+")"				{return new Symbol(sym.PARFERME);}
+"."				{return new Symbol(sym.POINT, yytext());}
+";"				{return new Symbol(sym.POINT_VIRGULE, yytext());} 
 
-
-
-// qqs exemples de règles de détection d'erreurs lexicales...
-{erreur_ident} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => syntaxe identificateur non respectee ! "); }
+{identificateur} 	 	{System.out.print("identificateur"); }
 
 {erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
 
-.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃ¨re inconnu ! "); } 
+.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractère inconnu ! "); } 
+
+
