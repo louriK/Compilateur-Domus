@@ -42,7 +42,7 @@ texte = \" ~ \"
 erreur_chaine = \"[^\"\n]*\n  
 
 %%
-// qqs exemples de r�gles lexicales l�gales...
+// qqs exemples de règles lexicales légales...
 {date}				{return new Symbol(sym.DATE,yytext());}
 {appareil}			{return new Symbol(sym.APPAREIL, yytext());}
 {interface}			{return new Symbol(sym.INTERFACE, yytext());}
@@ -91,10 +91,10 @@ fsi			 	{return new Symbol(sym.FINSI);}
 "."				{return new Symbol(sym.POINT, yytext());}
 ";"				{return new Symbol(sym.POINT_VIRGULE, yytext());} 
 
-{identificateur} 	 	{System.out.print("identificateur"); }
+{identificateur} 	 	{return new Symbol(sym.IDENTIFICATEUR, yytext());}
 
 {erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
 
-.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractère inconnu ! "); } 
+.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃ¨re inconnu ! "); } 
 
 
