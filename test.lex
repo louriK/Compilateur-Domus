@@ -23,15 +23,12 @@
 // qqs exemples de macros...
 chiffre = [0-9]
 identificateur = [a-zA-Z0-9\_]+
-guillemet = "\\\""
 annee = {chiffre}{chiffre}{chiffre}{chiffre}|\_
 mois = {chiffre}{chiffre}|{chiffre}|\_
 jour = {chiffre}{chiffre}|{chiffre}|\_
 heure = {chiffre}{chiffre}|{chiffre}|\_
 minutes = {chiffre}{chiffre}| {chiffre}|\_
 date = ({annee},{mois},{jour},{heure},{minutes}) 
-caractere = [a-zA-Zיטאשןמ]
-chaine_de_car = {caractere}+
 autre_appareil = tv|hifi|cafetiere|video_proj|lave_vaisselle|lave_linge|seche_linge|ordinateur|portail
 appareil = eclairage|volet|chauffage|alarme|fenetre|autre\_appareil\({autre_appareil}\)
 interface = interrupteur|mobile|telephone|telecommande|tablette
@@ -43,8 +40,7 @@ point = [.]
 point_virgule = [;]
 retour_ligne = \n
 commentaire = \/\/ ~\n
-texte = \"(.|{guillemet})*\" 
-erreur_ident = [0-9]+[a-zA-Z]+
+texte = \" ~ \"
 erreur_chaine = \"[^\"\n]*\n  
 
 %%
@@ -96,8 +92,6 @@ fsi			 	{ System.out.print("fsi");}
 ":" 				{ System.out.print(":");}
 "("				{ System.out.print("(");}
 ")"				{ System.out.print(")");}
-"||"				{ System.out.print("||");}
-"&&"				{ System.out.print("&&");}
 
 {identificateur} 	 	{ System.out.print("identificateur"); }
 
