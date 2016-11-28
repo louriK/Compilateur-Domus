@@ -35,7 +35,7 @@ autre_appareil = tv|hifi|cafetiere|video_proj|lave_vaisselle|lave_linge|seche_li
 appareil = eclairage|volet|chauffage|alarme|fenetre|autre_appareil({autre_appareil})
 interface = interrupteur|mobile|telephone|telecommande|tablette
 comparateur = "=="|"<="|">="|"!="
-fonction_etat = \.ouvrir|\.fermer |\.eteindre|\.allumer|\.tamiser|\.etat|\.allumer_partiel|\.allumer_eco|\.ouvrir_partiel|\.fermer_partiel|
+fonction_etat = \.ouvrir|\.fermer |\.eteindre|\.allumer|\.tamiser|\.etat|\.allumer_partiel|\.allumer_eco|\.ouvrir_partiel|\.fermer_partiel
 etat = eteint|demi|eco|ouvvert|ferme
 espace = [\ \b\t]+
 finligne = [.;]
@@ -47,13 +47,13 @@ erreur_ident = [0-9]+[a-zA-Z]+
 erreur_chaine = \"[^\"\n]*\n  
 
 %%
-// qqs exemples de règles lexicales légales...
+// qqs exemples de rÃ¨gles lexicales lÃ©gales...
 {entier} 		 	{ return new Symbol(sym.ENTIER, new Integer(yytext())); }
 {identificateur} 	 	{ return new Symbol(sym.IDENTIFICATEUR, yytext()); }
 {date}				{ return new Symbol(sym.DATE,yytext());}
 {appareil}			{ return new Symbol(sym.APPAREIL, yytext());}
 {interface}			{ return new Symbol(sym.INTERFACE, yytext());}
-{condition}			{ return new Symbol(sym.CONDITION, yytext());}
+{comparateur}			{ return new Symbol(sym.COMPARATEUR, yytext());}
 {fonction_etat}			{ return new Symbol(sym.FONCTION_ETAT, yytext());}
 {etat}				{ return new Symbol(sym.ETAT, yytext());}
 {espace} 			{}
@@ -97,11 +97,9 @@ fsi			 	{ return new Symbol(sym.FINSI);}
 
 
 
-// qqs exemples de règles de détection d'erreurs lexicales...
+// qqs exemples de rÃ¨gles de dÃ©tection d'erreurs lexicales...
 {erreur_ident} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => syntaxe identificateur non respectee ! "); }
 
 {erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
 
-.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃ¨re inconnu ! "); } 
-
-
+.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃƒÂ¨re inconnu ! "); } 
