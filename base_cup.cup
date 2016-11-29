@@ -141,7 +141,7 @@ liste_identifiant_associer ::= liste_identifiant_associer VIRGULE IDENTIFICATEUR
 
 programmer ::= PROGRAMMER IDENTIFICATEUR ASSIGNATION liste_programmer POINT_VIRGULE |  PROGRAMMER IDENTIFICATEUR ASSIGNATION DATE POINT_VIRGULE;
 
-liste_programmer ::= PAROUVRE liste_date_programmer PARFERME;
+liste_programmer ::= ACOUVRE liste_date_programmer ACFERME;
 
 liste_date_programmer ::= liste_date_programmer VIRGULE DATE | DATE;
 
