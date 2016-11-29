@@ -1,23 +1,14 @@
-
+import java_cup.runtime.Symbol;
 
 %%
-%class lexer
+%cup
 %unicode
 %int
-%standalone		//debug ou standalone
 %line
 %column
 
 %{
-	public int getYyLine(){
-		return yyline+1;
-	}
-	public int getYyColumn(){
-		return yycolumn+1;
-	}
-	public String getYyText(){
-		return yytext();
-	}
+
 %}
 
 // qqs exemples de macros...
@@ -32,7 +23,7 @@ date = ({annee},{mois},{jour},{heure},{minutes})
 autre_appareil = tv|hifi|cafetiere|video_proj|lave_vaisselle|lave_linge|seche_linge|ordinateur|portail
 appareil = eclairage|volet|chauffage|alarme|fenetre|autre\_appareil\({autre_appareil}\)
 interface = interrupteur|mobile|telephone|telecommande|tablette
-operateur = "=="|"<="|">="|"!=" | "||" | "&&"
+operateur = "==" |†"!=" | "||" | "&&"
 fonction_etat = ouvrir|fermer|eteindre|allumer|tamiser|etat|allumer_partiel|allumer_eco|ouvrir_partiel|fermer_partiel
 etat = eteint|demi|eco|ouvvert|ferme
 espace = [\ \b\t]+
@@ -42,7 +33,7 @@ texte = \" ~ \"
 erreur_chaine = \"[^\"\n]*\n  
 
 %%
-// qqs exemples de r√®gles lexicales l√©gales...
+// qqs exemples de rËgles lexicales lÈgales...
 {date}				{return new Symbol(sym.DATE,yytext());}
 {appareil}			{return new Symbol(sym.APPAREIL, yytext());}
 {interface}			{return new Symbol(sym.INTERFACE, yytext());}
@@ -66,8 +57,7 @@ erreur_chaine = \"[^\"\n]*\n
 "</DECLARATION_COMMANDES>"	{return new Symbol(sym.FIN_COMMANDES); }
 "<SCENARIO"			{return new Symbol(sym.DEBUT_SCENARIO);}
 "</SCENARIO"			{return new Symbol(sym.FIN_SCENARIO);}
-"<"				{return new Symbol(sym.INFERIEUR);}
-">"				{return new Symbol(sym.SUPERIEUR);}
+">"				{return new Symbol(sym.FIN_DE_BALISE);}
 definir			 	{return new Symbol(sym.ENUM);}
 executer_scenario	 	{return new Symbol(sym.EXECUTER_SCENARIO);}
 associer		 	{return new Symbol(sym.ASSOCIER);}
@@ -82,8 +72,7 @@ fait				{return new Symbol(sym.FAIT);}
 fsi			 	{return new Symbol(sym.FINSI);}
 ","			 	{return new Symbol(sym.VIRGULE);}
 "{"			 	{return new Symbol(sym.ACOUVRE);}	
-"}"			 	{return new Symbol(sym.ACFERME);}		 
-\"			 	{return new Symbol(sym.GUILLEMET);}
+"}"			 	{return new Symbol(sym.ACFERME);}	
 "="				{return new Symbol(sym.ASSIGNATION);}
 ":" 				{return new Symbol(sym.PARCOURS);}
 "("				{return new Symbol(sym.PAROUVRE);}
@@ -95,6 +84,6 @@ fsi			 	{return new Symbol(sym.FINSI);}
 
 {erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
 
-.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caract√É¬®re inconnu ! "); } 
+.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caract√®re inconnu ! "); } 
 
 
