@@ -3,22 +3,21 @@ JFLEX      = java JFlex.Main
 JAVA       = java
 JAVAC      = javac
 
-all: JFLEX 
+all: JFLEX CUP compile export
 
 JFLEX: 
 	java JFlex.Main base_lex.lex 
 
 CUP: 
-	java java_cup.Main -expect 28 projet.cup
+	java java_cup.Main -expect 44 base_cup.cup
 
 compile:  
 	javac Yylex.java sym.java parser.java
 
 export:	
-	java parser < projetTest > Bibliotheque.html
+	java parser < test.lex
 
-launch :
-	firefox Bibliotheque.html
+
 clean:
 	rm -rf *.class
 	rm -rf *.java
