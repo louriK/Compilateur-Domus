@@ -7,6 +7,18 @@ import java_cup.runtime.Symbol;
 %line
 %column
 
+%{
+	public int getYyLine(){
+		return yyline+1;
+	}
+	public int getYyColumn(){
+		return yycolumn+1;
+	}
+	public String getYyText(){
+		return yytext();
+	}
+%}
+
 // qqs exemples de macros...
 chiffre = [0-9]
 identificateur = [a-zA-Z0-9_]+
@@ -81,42 +93,3 @@ fsi			 	{return new Symbol(sym.FINSI);}
 {erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
 
 . {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃ¨re inconnu ! "); } 
-"</DECLARATION_APPAREILS>" 	{return new Symbol(sym.FIN_APPAREIL);}
-"<DECLARATION_INTERFACES>" 	{return new Symbol(sym.DEBUT_INTERFACES);}
-"</DECLARATION_INTERFACES>"	{return new Symbol(sym.FIN_INTERFACES);} 
-"<DECLARATION_SCENARII>"	{return new Symbol(sym.DEBUT_SCENARII);}
-"</DECLARATION_SCENARII>"	{return new Symbol(sym.FIN_SCENARII);}
-"<DECLARATION_COMMANDES>" 	{return new Symbol(sym.DEBUT_COMMANDES);}
-"</DECLARATION_COMMANDES>"	{return new Symbol(sym.FIN_COMMANDES); }
-"<SCENARIO"			{return new Symbol(sym.DEBUT_SCENARIO);}
-"</SCENARIO"			{return new Symbol(sym.FIN_SCENARIO);}
-">"				{return new Symbol(sym.FIN_DE_BALISE);}
-definir			 	{return new Symbol(sym.ENUM);}
-executer_scenario	 	{return new Symbol(sym.EXECUTER_SCENARIO);}
-associer		 	{return new Symbol(sym.ASSOCIER);}
-programmer		 	{return new Symbol(sym.PROGRAMMER);}
-message			 	{return new Symbol(sym.MESSAGE);}
-pourtout		 	{return new Symbol(sym.POURTOUT);}
-si			 	{return new Symbol(sym.SI);}
-alors			 	{return new Symbol(sym.ALORS);}
-sinon			 	{return new Symbol(sym.SINON);}
-faire			 	{return new Symbol(sym.FAIRE);}
-fait				{return new Symbol(sym.FAIT);}
-fsi			 	{return new Symbol(sym.FINSI);}
-","			 	{return new Symbol(sym.VIRGULE);}
-"{"			 	{return new Symbol(sym.ACOUVRE);}	
-"}"			 	{return new Symbol(sym.ACFERME);}	
-"="				{return new Symbol(sym.ASSIGNATION);}
-":" 				{return new Symbol(sym.PARCOURS);}
-"("				{return new Symbol(sym.PAROUVRE);}
-")"				{return new Symbol(sym.PARFERME);}
-"."				{return new Symbol(sym.POINT, yytext());}
-";"				{return new Symbol(sym.POINT_VIRGULE, yytext());} 
-
-{identificateur} 	 	{return new Symbol(sym.IDENTIFICATEUR, yytext());}
-
-{erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
-
-.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃ¨re inconnu ! "); } 
-
-
