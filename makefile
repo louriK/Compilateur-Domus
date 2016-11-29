@@ -15,7 +15,7 @@ compile:
 	javac Yylex.java sym.java parser.java
 
 export:	
-	java parser exemple_projet_domus.txt
+	java parser < exemple_projet_domus.txt
 
 
 clean:
