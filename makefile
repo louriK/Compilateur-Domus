@@ -9,7 +9,7 @@ JFLEX:
 	java JFlex.Main base_lex.lex 
 
 CUP: 
-	java java_cup.Main -expect 44 base_cup.cup
+	java java_cup.Main base_cup.cup
 
 compile:  
 	javac Yylex.java sym.java parser.java
