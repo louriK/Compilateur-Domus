@@ -1,30 +1,26 @@
 import java_cup.runtime.Symbol;
 
 %%
-%cup
 %unicode
 %int
+%cup
 %line
 %column
 
-%{
-
-%}
-
 // qqs exemples de macros...
 chiffre = [0-9]
-identificateur = [a-zA-Z0-9\_]+
+identificateur = [a-zA-Z0-9_]+
 annee = {chiffre}{chiffre}{chiffre}{chiffre}|\_
 mois = {chiffre}{chiffre}|{chiffre}|\_
 jour = {chiffre}{chiffre}|{chiffre}|\_
 heure = {chiffre}{chiffre}|{chiffre}|\_
 minutes = {chiffre}{chiffre}| {chiffre}|\_
-date = ({annee},{mois},{jour},{heure},{minutes}) 
+date = {annee},{mois},{jour},{heure},{minutes} 
 autre_appareil = tv|hifi|cafetiere|video_proj|lave_vaisselle|lave_linge|seche_linge|ordinateur|portail
 appareil = eclairage|volet|chauffage|alarme|fenetre|autre\_appareil\({autre_appareil}\)
 interface = interrupteur|mobile|telephone|telecommande|tablette
-operateur = "==" |�"!=" | "||" | "&&"
-fonction_etat = ouvrir|fermer|eteindre|allumer|tamiser|etat|allumer_partiel|allumer_eco|ouvrir_partiel|fermer_partiel
+operateur = "==" | "!=" | "||" | "&&"
+fonction_etat = etat|ouvrir|fermer|eteindre|allumer|tamiser|etat|allumer_partiel|allumer_eco|ouvrir_partiel|fermer_partiel
 etat = eteint|demi|eco|ouvvert|ferme
 espace = [\ \b\t]+
 retour_ligne = \n
@@ -33,7 +29,7 @@ texte = \" ~ \"
 erreur_chaine = \"[^\"\n]*\n  
 
 %%
-// qqs exemples de r�gles lexicales l�gales...
+// qqs exemples de règles lexicales légales...
 {date}				{return new Symbol(sym.DATE,yytext());}
 {appareil}			{return new Symbol(sym.APPAREIL, yytext());}
 {interface}			{return new Symbol(sym.INTERFACE, yytext());}
@@ -84,6 +80,43 @@ fsi			 	{return new Symbol(sym.FINSI);}
 
 {erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
 
-.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractère inconnu ! "); } 
+. {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃ¨re inconnu ! "); } 
+"</DECLARATION_APPAREILS>" 	{return new Symbol(sym.FIN_APPAREIL);}
+"<DECLARATION_INTERFACES>" 	{return new Symbol(sym.DEBUT_INTERFACES);}
+"</DECLARATION_INTERFACES>"	{return new Symbol(sym.FIN_INTERFACES);} 
+"<DECLARATION_SCENARII>"	{return new Symbol(sym.DEBUT_SCENARII);}
+"</DECLARATION_SCENARII>"	{return new Symbol(sym.FIN_SCENARII);}
+"<DECLARATION_COMMANDES>" 	{return new Symbol(sym.DEBUT_COMMANDES);}
+"</DECLARATION_COMMANDES>"	{return new Symbol(sym.FIN_COMMANDES); }
+"<SCENARIO"			{return new Symbol(sym.DEBUT_SCENARIO);}
+"</SCENARIO"			{return new Symbol(sym.FIN_SCENARIO);}
+">"				{return new Symbol(sym.FIN_DE_BALISE);}
+definir			 	{return new Symbol(sym.ENUM);}
+executer_scenario	 	{return new Symbol(sym.EXECUTER_SCENARIO);}
+associer		 	{return new Symbol(sym.ASSOCIER);}
+programmer		 	{return new Symbol(sym.PROGRAMMER);}
+message			 	{return new Symbol(sym.MESSAGE);}
+pourtout		 	{return new Symbol(sym.POURTOUT);}
+si			 	{return new Symbol(sym.SI);}
+alors			 	{return new Symbol(sym.ALORS);}
+sinon			 	{return new Symbol(sym.SINON);}
+faire			 	{return new Symbol(sym.FAIRE);}
+fait				{return new Symbol(sym.FAIT);}
+fsi			 	{return new Symbol(sym.FINSI);}
+","			 	{return new Symbol(sym.VIRGULE);}
+"{"			 	{return new Symbol(sym.ACOUVRE);}	
+"}"			 	{return new Symbol(sym.ACFERME);}	
+"="				{return new Symbol(sym.ASSIGNATION);}
+":" 				{return new Symbol(sym.PARCOURS);}
+"("				{return new Symbol(sym.PAROUVRE);}
+")"				{return new Symbol(sym.PARFERME);}
+"."				{return new Symbol(sym.POINT, yytext());}
+";"				{return new Symbol(sym.POINT_VIRGULE, yytext());} 
+
+{identificateur} 	 	{return new Symbol(sym.IDENTIFICATEUR, yytext());}
+
+{erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
+
+.  {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃ¨re inconnu ! "); } 
 
 
