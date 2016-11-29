@@ -7,47 +7,85 @@ parser code {:
 	public static void main(String args[]) throws Exception {
 		new parser(new Yylex(System.in)).parse();
 	}
-/*
-	public void syntax_error(Symbol cur_token) { 
-		// n'interrompt pas la compil... 
-		// on est par defaut dans l'etat error qui permet ensuite la recup
-		// par défaut : report_error("syntax error", null);
-		report_error("Syntaxe incorrecte <"+tokenToString(cur_token)+">", null);        
-	}
+:}
 
-	public void report_error(String message, Object info) {   
-		// n'interrompt pas la compil
-		if (info == null) System.err.println("Mon erreur <"+ ptext()+ "> ligne "+ pline() + ", colonne " + pcolumn() + " : " + message);
-		else System.err.println("Mon erreur <"+ptext()+ "> ligne "+ pline() + ", colonne " + pcolumn() + " : " +message+" : "+info);
-		System.err.println("-> mais on continue l'analyse... ");
-	}
+init with {:
+	System.out.println("init code");
+:}
 
-	public void unrecovered_syntax_error(Symbol cur_token) {
-    	// par defaut : report_fatal_error("Couldn't repair and continue parse", null);
-		// on n'a pas reussi a faire de la recup
-		report_fatal_error("Recuperation impossible <"+tokenToString(cur_token)+">", null);   // interrompt la compil     
-	}
+terminal DEBUT_DOMUS, FIN_DOMUS, DEBUT_APPAREIL, FIN_APPAREIL, DEBUT_INTERFACES, FIN_INTERFACES, DEBUT_SCENARII, FIN_SCENARII, DEBUT_COMMANDES, FIN_COMMANDES, APPAREIL, POINT, VIRGULE, IDENTIFICATEUR, ENUM, ASSIGNATION,  PAROUVRE, PARFERME, INTERFACE, DEBUT_SCENARIO, FIN_SCENARIO, FONCTION_ETAT, POINT_VIRGULE, EXECUTER_SCENARIO, MESSAGE, TEXTE, POURTOUT, PARCOURS, FAIRE, FAIT, SI, ALORS, SINON, FINSI, ASSOCIER, PROGRAMMER, DATE, ACFERME, ETAT, ACOUVRE, OPERATEUR, FIN_DE_BALISE;
 
-	public void report_fatal_error(String message, Object info) {  
-		// qd cette fct est appelee, message vaut par defaut "Couldn't repair and continue parse"
-		String m = "Mon erreur fatale <"+ ptext()+ "> ligne " + pline() + ", colonne " + pcolumn() + " : " + message;
-		if (info == null) System.err.println(m);
-		else System.err.println(m+" : "+info);
-		System.err.println("-> arrêt de l'analyse...");
-		done_parsing(); // interrompt la compil
-  	}
+non terminal ini, declaration, liste_appareil, liste_interface, liste_commande, liste_identifiant_appareil, interface, scenarii, commande, appareil, enum_appareil, liste_identifiant_interface, scenario, instruction, execution, affichage, liste_elemts, elem, boucle, condition, associer, liste_associer, liste_identifiant_associer, programmer, liste_date, liste_date_programmer, test, liste_instructions, entrees_appareil, entree, valeur;
 
-	public int pline(){
-		return ((Yylex)getScanner()).getYyLine();
-	}
-	public int pcolumn(){
-		return ((Yylex)getScanner()).getYyColumn();
-	}
-	public String ptext(){
-		return ((Yylex)getScanner()).getYyText();
-	}
+ini ::= DEBUT_DOMUS declaration FIN_DOMUS;
 
+declaration ::= DEBUT_APPAREIL entrees_appareil  FIN_APPAREIL DEBUT_INTERFACES liste_interface FIN_INTERFACES DEBUT_SCENARII scenarii FIN_SCENARII DEBUT_COMMANDES liste_commande FIN_COMMANDES;
 
+// ---------------------------DECLARATION APPAREIL---------------------------------------
+
+//liste_appareil ::= appareil liste_appareil | enum_appareil liste_appareil |  enum_appareil | appareil;
+entrees_appareil ::= entrees_appareil appareil | appareil | enum_appareil | entrees_appareil enum_appareil;
+
+appareil ::= APPAREIL liste_identifiant_appareil POINT;
+
+enum_appareil ::= ENUM IDENTIFICATEUR ASSIGNATION ACOUVRE liste_identifiant_appareil ACFERME POINT;
+
+liste_identifiant_appareil ::= liste_identifiant_appareil VIRGULE IDENTIFICATEUR | IDENTIFICATEUR ;
+
+// ---------------------------DECLARATION INTERFACE---------------------------------------
+
+liste_interface ::= liste_interface interface | interface;
+
+interface ::= INTERFACE liste_identifiant_interface POINT;
+
+liste_identifiant_interface ::= liste_identifiant_interface VIRGULE IDENTIFICATEUR| IDENTIFICATEUR;
+
+// ---------------------------DECLARATION SCENARII---------------------------------------
+
+scenarii ::= scenarii DEBUT_SCENARIO IDENTIFICATEUR FIN_DE_BALISE scenario FIN_SCENARIO IDENTIFICATEUR FIN_DE_BALISE |DEBUT_SCENARIO IDENTIFICATEUR FIN_DE_BALISE scenario FIN_SCENARIO IDENTIFICATEUR FIN_DE_BALISE;
+
+// ---------------------------DECLARATION SCENARIO---------------------------------------
+
+scenario ::= scenario instruction | instruction;
+
+instruction ::= condition | affichage | execution | boucle | IDENTIFICATEUR POINT FONCTION_ETAT POINT_VIRGULE;
+
+execution ::= EXECUTER_SCENARIO IDENTIFICATEUR POINT_VIRGULE;
+
+affichage ::= MESSAGE PAROUVRE liste_elemts PARFERME POINT_VIRGULE;
+
+liste_elemts ::= liste_elemts VIRGULE elem | elem;
+elem ::= TEXTE | IDENTIFICATEUR;
+
+boucle ::= POURTOUT IDENTIFICATEUR PARCOURS entree FAIRE instruction FAIT POINT_VIRGULE;
+
+entree ::= APPAREIL | IDENTIFICATEUR;
+
+condition ::= SI test ALORS liste_instructions FINSI POINT_VIRGULE | SI test ALORS liste_instructions SINON liste_instructions FINSI POINT_VIRGULE;
+
+test ::= PAROUVRE valeur OPERATEUR valeur PARFERME;
+
+valeur ::= IDENTIFICATEUR POINT FONCTION_ETAT | ETAT;
+
+liste_instructions ::= liste_instructions VIRGULE instruction | instruction;
+
+// ---------------------------DECLARATION COMMANDE---------------------------------------
+
+liste_commande ::= liste_commande commande | commande;
+
+commande ::= associer | programmer;
+
+associer ::= ASSOCIER IDENTIFICATEUR ASSIGNATION liste_associer POINT | ASSOCIER IDENTIFICATEUR ASSIGNATION IDENTIFICATEUR POINT;
+
+liste_associer ::= ACOUVRE liste_identifiant_associer ACFERME;
+
+liste_identifiant_associer ::= liste_identifiant_associer VIRGULE IDENTIFICATEUR | IDENTIFICATEUR;
+
+programmer ::= PROGRAMMER IDENTIFICATEUR ASSIGNATION liste_date POINT | PROGRAMMER IDENTIFICATEUR ASSIGNATION PAROUVRE DATE PARFERME POINT;
+
+liste_date ::= ACOUVRE liste_date_programmer ACFERME;
+
+liste_date_programmer ::= liste_date_programmer VIRGULE PAROUVRE DATE PARFERME | PAROUVRE DATE PARFERME;
 public String tokenToString (Symbol token) {
 // qqs exemples pour voir...
      switch (token.sym) {
