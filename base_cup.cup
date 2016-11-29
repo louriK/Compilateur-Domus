@@ -11,7 +11,7 @@ parser code {:
 	public void syntax_error(Symbol cur_token) { 
 		// n'interrompt pas la compil... 
 		// on est par defaut dans l'etat error qui permet ensuite la recup
-		// par défaut : report_error("syntax error", null);
+		// par dÃ©faut : report_error("syntax error", null);
 		report_error("Syntaxe incorrecte <"+tokenToString(cur_token)+">", null);        
 	}
 
@@ -33,7 +33,7 @@ parser code {:
 		String m = "Mon erreur fatale <"+ ptext()+ "> ligne " + pline() + ", colonne " + pcolumn() + " : " + message;
 		if (info == null) System.err.println(m);
 		else System.err.println(m+" : "+info);
-		System.err.println("-> arrêt de l'analyse...");
+		System.err.println("-> arrÃªt de l'analyse...");
 		done_parsing(); // interrompt la compil
   	}
 
@@ -54,8 +54,8 @@ public String tokenToString (Symbol token) {
 	case sym.SI : return "SI"; 
 	case sym.CHAINE : return "CHAINE "+token.value;  
 	case sym.ENTIER : return "ENTIER "+token.value;  
-	//  ... A compléter !!
-	default : return "Token imprévu ou error";
+	//  ... A complÃ©ter !!
+	default : return "Token imprÃ©vu ou error";
 	}
 }
 */
@@ -89,7 +89,7 @@ liste_appareil ::= appareil liste_appareil | enum_appareil liste_appareil |  enu
 
 appareil ::= APPAREIL liste_identifiant_appareil POINT;
 
-enum_appareil ::= ENUM IDENTIFICATEUR ASSIGNATION PAROUVRE liste_identifiant_appareil PARFERME POINT;
+enum_appareil ::= ENUM IDENTIFICATEUR ASSIGNATION ACOUVRE liste_identifiant_appareil ACFERME POINT;
 
 liste_identifiant_appareil ::= liste_identifiant_appareil VIRGULE IDENTIFICATEUR | IDENTIFICATEUR ;
 
@@ -135,7 +135,7 @@ commande ::= associer | programmer;
 
 associer ::= ASSOCIER IDENTIFICATEUR ASSIGNATION liste_associer POINT | ASSOCIER IDENTIFICATEUR ASSIGNATION IDENTIFICATEUR POINT_VIRGULE;
 
-liste_associer ::= PAROUVRE liste_identifiant_associer PARFERME;
+liste_associer ::= ACOUVRE liste_identifiant_associer ACFERME;
 
 liste_identifiant_associer ::= liste_identifiant_associer VIRGULE IDENTIFICATEUR | IDENTIFICATEUR;
 
