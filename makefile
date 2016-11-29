@@ -23,6 +23,5 @@ clean:
 	rm -rf *.java
 
 mrproper: clean
-	rm -rf Bibliotheque.html 
 	rm -rf *.j*
 	
