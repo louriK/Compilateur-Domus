@@ -7,7 +7,7 @@ parser code {:
 	public static void main(String args[]) throws Exception {
 		new parser(new Yylex(System.in)).parse();
 	}
-
+/*
 	public void syntax_error(Symbol cur_token) { 
 		// n'interrompt pas la compil... 
 		// on est par defaut dans l'etat error qui permet ensuite la recup
@@ -58,27 +58,90 @@ public String tokenToString (Symbol token) {
 	default : return "Token imprévu ou error";
 	}
 }
-
+*/
 :}
 
-
+init with {:
+	//System.out.println("init code");
+:}
 
 action code {:
-
+/*	
 void exemple_de_fonction(String i1, String i2)
 {
 	String m = "Erreur syntaxique <"+i2+"> au lieu de <"+i1+">";
 	if (!(i1.equals(i2))) parser.report_error(m,null);	 
 }
-
+*/
 :}
 
-terminal ..... ;
+terminal DEBUT_DOMUS, FIN_DOMUS, DEBUT_APPAREIL, FIN_APPAREIL, DEBUT_INTERFACES, FIN_INTERFACES, DEBUT_SCENARII, FIN_SCENARII, DEBUT_COMMANDES, FIN_COMMANDES, APPAREIL, POINT, VIRGULE, IDENTIFICATEUR, ENUM, ASSIGNATION,  PAROUVRE, PARFERME, INTERFACE, DEBUT_SCENARIO, FIN_SCENARIO, FONCTION_ETAT, POINT_VIRGULE, EXECUTER_SCENARIO, MESSAGE, TEXTE, POURTOUT, PARCOURS, FAIRE, FAIT, SI, ALORS, SINON, FINSI, ASSOCIER, PROGRAMMER, DATE, ACFERME, ETAT, ACOUVRE, OPERATEUR, FIN_DE_BALISE;
 
-non terminal prog, ... ;
- 
-prog	::= lcomment PROG ....   FINPROG {: System.out.println("FINPROG "+parser.pline()+","+parser.pcolumn()); :} ;
+non terminal ini, declaration,liste_appareil, liste_interface, liste_commande, liste_identifiant_appareil, interface, scenarii, commande,appareil, enum_appareil, liste_identifiant_interface, scenario, instruction, execution, affichage, liste_elemts, elem, boucle, condition, associer, liste_associer, liste_identifiant_associer, programmer, liste_programmer, liste_date_programmer, test, liste_instructions;
 
+ini ::= DEBUT_DOMUS declaration FIN_DOMUS;
 
-dec	::= VAR PT {: System.out.println("décla ok"+ " ligne "+ parser.pline()); :}
-	| error {: System.out.println("Récupération erreur syntaxique au niveau de la déclaration - déclaration non traitée"); :};
+declaration ::= DEBUT_APPAREIL liste_appareil  FIN_APPAREIL DEBUT_INTERFACES liste_interface FIN_INTERFACES DEBUT_SCENARII scenarii FIN_SCENARII DEBUT_COMMANDES liste_commande FIN_COMMANDES;
+
+// ---------------------------DECLARATION APPAREIL---------------------------------------
+
+liste_appareil ::= appareil liste_appareil | enum_appareil liste_appareil |  enum_appareil | appareil;
+
+appareil ::= APPAREIL liste_identifiant_appareil POINT;
+
+enum_appareil ::= ENUM IDENTIFICATEUR ASSIGNATION PAROUVRE liste_identifiant_appareil PARFERME POINT;
+
+liste_identifiant_appareil ::= liste_identifiant_appareil VIRGULE IDENTIFICATEUR | IDENTIFICATEUR ;
+
+// ---------------------------DECLARATION INTERFACE---------------------------------------
+
+liste_interface ::= interface liste_interface | interface;
+
+interface ::= INTERFACE liste_identifiant_interface POINT;
+
+liste_identifiant_interface ::= liste_identifiant_interface IDENTIFICATEUR VIRGULE| IDENTIFICATEUR;
+
+// ---------------------------DECLARATION SCENARII---------------------------------------
+
+scenarii ::= DEBUT_SCENARIO IDENTIFICATEUR FIN_DE_BALISE scenario FIN_SCENARIO IDENTIFICATEUR FIN_DE_BALISE scenarii |
+DEBUT_SCENARIO IDENTIFICATEUR FIN_DE_BALISE scenario FIN_SCENARIO IDENTIFICATEUR FIN_DE_BALISE;
+
+// ---------------------------DECLARATION SCENARIO---------------------------------------
+
+scenario ::= instruction scenario | instruction;
+
+instruction ::= condition | affichage | execution | boucle | IDENTIFICATEUR POINT FONCTION_ETAT POINT_VIRGULE;
+
+execution ::= EXECUTER_SCENARIO IDENTIFICATEUR POINT_VIRGULE;
+
+affichage ::= MESSAGE PAROUVRE liste_elemts PARFERME POINT_VIRGULE;
+
+liste_elemts ::= liste_elemts VIRGULE elem | elem;
+elem ::= TEXTE | IDENTIFICATEUR;
+
+boucle ::= POURTOUT IDENTIFICATEUR PARCOURS APPAREIL FAIRE instruction POINT_VIRGULE FAIT POINT_VIRGULE;
+
+condition ::= SI test ALORS liste_instructions FINSI POINT_VIRGULE | SI test ALORS liste_instructions SINON liste_instructions FINSI POINT_VIRGULE;
+
+test ::= PAROUVRE test OPERATEUR test PARFERME | IDENTIFICATEUR;
+
+liste_instructions ::= liste_instructions  VIRGULE instruction | instruction;
+
+// ---------------------------DECLARATION COMMANDE---------------------------------------
+
+liste_commande ::= commande liste_commande | commande;
+
+commande ::= associer | programmer;
+
+associer ::= ASSOCIER IDENTIFICATEUR ASSIGNATION liste_associer POINT | ASSOCIER IDENTIFICATEUR ASSIGNATION IDENTIFICATEUR POINT_VIRGULE;
+
+liste_associer ::= PAROUVRE liste_identifiant_associer PARFERME;
+
+liste_identifiant_associer ::= liste_identifiant_associer VIRGULE IDENTIFICATEUR | IDENTIFICATEUR;
+
+programmer ::= PROGRAMMER IDENTIFICATEUR ASSIGNATION liste_programmer POINT_VIRGULE |  PROGRAMMER IDENTIFICATEUR ASSIGNATION DATE POINT_VIRGULE;
+
+liste_programmer ::= PAROUVRE liste_date_programmer PARFERME;
+
+liste_date_programmer ::= liste_date_programmer VIRGULE DATE | DATE;
+
