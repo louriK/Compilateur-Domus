@@ -654,7 +654,7 @@ declaration ::= DEBUT_APPAREIL liste_appareil  FIN_APPAREIL DEBUT_INTERFACES lis
 // ---------------------------DECLARATION APPAREIL---------------------------------------
 
 liste_appareil ::= liste_appareil appareil | appareil | enum_appareil | liste_appareil enum_appareil;
-
+//méthode pour déclarer un appareil ou plus avec, vérification du nom pour éviter les doublons
 appareil ::= APPAREIL:t liste_identifiant_appareil POINT {:
 	for(Object s : temp) {
 		if(!appareilExiste(s)) appareils.add(new Object[] {s.toString(), false, t});
@@ -672,6 +672,7 @@ identifiant_appareil ::= IDENTIFICATEUR:e{: temp.add(e); :};
 
 // ------GESTION DES ENUMS ------
 
+//méthode pour déclarer une énumération ou plus avec, vérification du nom pour éviter les doublons
 enum_appareil ::= ENUM IDENTIFICATEUR:e ASSIGNATION ACOUVRE liste_identifiant_appareil_enum ACFERME POINT {:
 	if(!enumAppareilExiste(e)) enums_appareils.add(new Object[] {e, type_enum, new ArrayList<Object>(temp)});
 	else {
@@ -694,7 +695,7 @@ identifiant_appareil_enum ::= IDENTIFICATEUR:e {:
 // ---------------------------DECLARATION INTERFACE---------------------------------------
 
 liste_interface ::= liste_interface interface | interface;
-
+//méthode pour déclarer une interface ou plus avec, vérification pour éviter les doublons
 interface ::= INTERFACE:t liste_identifiant_interface POINT {:
 	for(Object s : temp) {
 		if(!interfaceExiste(s)) interfaces.add(new Object[] {s.toString(), false, t, new ArrayList<Object>()});
@@ -719,7 +720,9 @@ scenarii ::= scenarii scenario | scenario;
 
 // ---------------------------DECLARATION SCENARIO---------------------------------------
 
+//Définition de la structure du scénario
 scenario ::= DEBUT_SCENARIO IDENTIFICATEUR:n {: nom_scenario = n.toString(); :} FIN_DE_BALISE instructions_scenario FIN_SCENARIO IDENTIFICATEUR:m FIN_DE_BALISE {:
+	//Vérification de la disponiblité du nom
 	if (scenarioExiste(n))
 	{
 		sortie_erreur += "Erreur ligne " + parser.pline() + " : Impossible de déclarer deux fois le même scénario (" + n.toString() + ").\n";
@@ -730,6 +733,7 @@ scenario ::= DEBUT_SCENARIO IDENTIFICATEUR:n {: nom_scenario = n.toString(); :} 
 		scenarios.add(new Object [] {n.toString(), false});
 		//System.out.println("scénario " + n + " ajouté");
 	}
+	//Vérification de la concordance des balises début/fin du scénario
    if(!m.toString().equals(nom_scenario)) {
       sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur de la balise de fin du scenario ne correspond pas à celui de la balise de début (" + nom_scenario + " != " + m.toString() + ").\n";
 		code_valide = false;
@@ -738,13 +742,17 @@ scenario ::= DEBUT_SCENARIO IDENTIFICATEUR:n {: nom_scenario = n.toString(); :} 
 
 instructions_scenario ::= instructions_scenario instruction | instruction;
 
+//Ensemble des instructions disponibles pour un scénario
 instruction ::= condition | affichage | execution | boucle | appel_fonction;
 
+//Fonction : un appareil/enum appelle une fonction 
 appel_fonction ::= IDENTIFICATEUR:i POINT fonction POINT_VIRGULE {:
+	//Vérification de l'existence de l'appareil
    if(!appareilExiste(i)) {
       sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur " + i + " n'existe pas.\n";
 		code_valide = false;   
    }
+   	//Vérification du type de l'appareil pour savoir s'il peut utliser la fonction qu'il demande
 	if (d.getFonctions(getTypeAppareil(i.toString()), temp.get(0).toString()))
 	{
 	   //System.out.println("l'appareil peut executer la fonction " + temp.get(0));
@@ -756,7 +764,7 @@ appel_fonction ::= IDENTIFICATEUR:i POINT fonction POINT_VIRGULE {:
 	}
 	vider_tampon();
 :};
-
+// fonction invalide = fonction non enregristrée 
 fonction ::= fonction_valide | fonction_invalide;
 
 fonction_valide ::= FONCTION_ETAT:f {: temp.add(f); :};
@@ -773,7 +781,7 @@ execution ::= EXECUTER_SCENARIO IDENTIFICATEUR:s POINT_VIRGULE {:	if (scenarioEx
 		code_valide = false;
 	}
 :};
-
+// affichage d'un message
 affichage ::= MESSAGE PAROUVRE liste_elemts PARFERME POINT_VIRGULE;
 
 liste_elemts ::= liste_elemts VIRGULE elem | elem;
@@ -788,13 +796,13 @@ elem ::= TEXTE | IDENTIFICATEUR:s {: if (appareilExiste(s))
 		code_valide = false; 
 	}
 :};
-
+// = Poutout
 boucle ::= POURTOUT IDENTIFICATEUR:a {: temp.add(a); :} PARCOURS entree FAIRE instruction FAIT POINT_VIRGULE {: 
 		supprimer_appareil(a.toString());
 :};
 
 entree ::= entree_appar | entree_ident;
-
+// Si appareil - on vérfie s'il existe
 entree_appar ::= APPAREIL:a {: if (d.typeAppareilExiste(a)) {
 		appareils.add(new Object[] {temp.get(0), false, a.toString()});
 		vider_tampon();
@@ -807,7 +815,7 @@ entree_appar ::= APPAREIL:a {: if (d.typeAppareilExiste(a)) {
 		vider_tampon();
 	}
 :};
-
+// Si enumération - on vérfie si elle existe
 entree_ident ::= IDENTIFICATEUR:a {: if (enumAppareilExiste(a)) {
 		appareils.add(new Object[] {temp.get(0), false, getTypeEnum(a.toString())});
 		vider_tampon();
@@ -820,11 +828,11 @@ entree_ident ::= IDENTIFICATEUR:a {: if (enumAppareilExiste(a)) {
       vider_tampon();
 	}
 :};
-
+// Si
 condition ::= SI test ALORS liste_instructions FINSI POINT_VIRGULE | SI test ALORS liste_instructions SINON liste_instructions FINSI POINT_VIRGULE;
-
+// la condition du Si
 test ::= PAROUVRE valeur OPERATEUR valeur PARFERME;
-
+// valeur = une fonction d'un appareil OU son état 
 valeur ::= IDENTIFICATEUR POINT FONCTION_ETAT | ETAT;
 
 liste_instructions ::= liste_instructions VIRGULE instruction | instruction;
@@ -888,4 +896,3 @@ liste_date_programmer ::= liste_date_programmer VIRGULE PAROUVRE DATE:d PARFERME
 		code_valide = false;
 	}
 :};
-
