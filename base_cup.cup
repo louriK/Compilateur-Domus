@@ -4,6 +4,8 @@ import java.util.*;
 import java.io.*;
 
 action code {:
+
+	// listes principales
 	List<Object[]> appareils = new ArrayList<Object[]>();
 	List<Object[]> interfaces= new ArrayList<Object[]>();
 	List<Object[]> scenarios = new ArrayList<Object[]>();
@@ -12,16 +14,18 @@ action code {:
 	List<Object[]> enums_appareils= new ArrayList<Object[]>();
 	List<Object[]> enums_dates= new ArrayList<Object[]>();
 
+	// listes de test ou temporaires
 	List<Object> temp = new ArrayList<Object>();
 	ArrayList<Object> liste_association_scenarios = new ArrayList<Object>();
 	ArrayList<Object> liste_programme_date = new ArrayList<Object>();
 		
-
+	// variable de tests
 	String sortie_erreur = "";
 	boolean code_valide = true;
 	String type_enum;
    	String nom_scenario;
 
+	
 	class Dico {
 		String [][] fonctions = new String [6][];
 		String [][] etats = new String [6][];
@@ -82,6 +86,7 @@ action code {:
 			return false;
 		}
 	}
+
 	Dico d = new Dico();
 
 	void exemple_de_fonction(String i1, String i2)
@@ -90,13 +95,16 @@ action code {:
 		if (!(i1.equals(i2))) parser.report_error(m,null);	 
 	}
 
+	// vide la liste temp
 	void vider_tampon() {
 		temp.clear();
 	}
 
+	// vérifie si un appareil est présent dans la liste appareils
 	boolean appareilExiste(Object chaine){
 		int i  = 0;
 		boolean trouve = false;
+		// on recherche l'appareil
 		while(i < appareils.size() && !trouve) {
 			if(appareils.get(i)[0].equals(chaine.toString())) { trouve = true;}
 			else i++;
@@ -104,15 +112,20 @@ action code {:
 		return trouve;
 	}
 
+	// supprime un appareil dans la liste appareils
 	void supprimer_appareil(String nom) {
+		// parcours de la liste appareils
 		for(int i = appareils.size() - 1; i > 0; i--) {
+			// si il s'agit de l'appareil recherché, on le supprime
 			if(appareils.get(i)[0].toString().equals(nom)) {appareils.remove(i); return;}
 		}
 	}
 
+	// vérifie si un appareil est présent dans la liste enumAppareil
 	boolean enumAppareilExiste(Object chaine){
 		int i  = 0;
 		boolean trouve = false;
+		// on recherche l'enum
 		while(i < enums_appareils.size() && !trouve) {
 			if(enums_appareils.get(i)[0].toString().equals(chaine.toString())) { trouve = true;}
 			else i++;
@@ -120,23 +133,31 @@ action code {:
 		return trouve;
 	}
 
-   Object getTypeAppareil(String nom) {
+	// recuperation du type d'un appareil
+   	Object getTypeAppareil(String nom) {
+		// parcours de la liste appareils
 		for(int i = 0; i < appareils.size(); i++) {
+			// si il s'agit de l'appareil recherché, on retourne son type
 			if(appareils.get(i)[0].equals(nom)) return appareils.get(i)[2];
 		}
 		return "null";
 	}
 
+	// recuperation du type d'un enum	
 	Object getTypeEnum(String nom) {
+		// parcours de la  enums_appareils
 		for(int i = 0; i < enums_appareils.size(); i++) {
+			// si il s'agit de l'enum recherché, on retourne son type
 			if(enums_appareils.get(i)[0].equals(nom)) return enums_appareils.get(i)[1];
 		}
 		return "null";
 	}
 
+	// vérifie si une interface est présente dans la liste interfacess
 	boolean interfaceExiste(Object chaine){
 		int i  = 0;
 		boolean trouve = false;
+		// on recherche l'interface
 		while(i < interfaces.size() && !trouve) {
 			if(interfaces.get(i)[0].toString().equals(chaine.toString())) { trouve = true;}
 			else i++;
@@ -144,49 +165,52 @@ action code {:
 		return trouve;
 	}
 
+	// vérifie si un scénario est présent dans la liste scenarios
 	boolean scenarioExiste(Object chaine){
 		int i = 0;
+		// on recherche le scenario
 		while(i < scenarios.size()) {
 			if(scenarios.get(i)[0].equals(chaine.toString())) { return true;}
 			else i++; 
 		}
 		return false;
 	}
-
-   boolean programmeExiste(Object s){
+	
+	// vérifie si un scénario est présent dans la liste programmations (à été programmé)
+   	boolean programmeExiste(Object s){
 		int i  = 0;
 		boolean trouve = false;
+		// recherche du scénario
 		while(i < programmations.size() && !trouve) {
 			if(programmations.get(i)[0].equals(s.toString())){ trouve = true;}
-			i++;
+			else i++;
 		}
 		return trouve;
-   }
+   	}
 
-   Object[] getInterface(Object chaine){
+	// retourne l'interface recherché
+   	Object[] getInterface(Object chaine){
 		int i = 0;
 		boolean trouve = false;
 		while(i < interfaces.size() && !trouve){
-			if(interfaces.get(i)[0].equals(chaine.toString())){ trouve = true;
-			}else{
-				i++;
-			}
+			if(interfaces.get(i)[0].equals(chaine.toString())){ trouve = true;}
+			else i++;
 		}
 		return interfaces.get(i);
 	}
 
+	// retourne le scénario recherché
 	Object[] getScenario(Object chaine){
 		int i = 0;
 		boolean trouve = false;
 		while(i < scenarios.size() && !trouve){
-			if(scenarios.get(i)[0].equals(chaine.toString())){ trouve = true;
-			}else{
-				i++;
-			}
+			if(scenarios.get(i)[0].equals(chaine.toString())){ trouve = true;}
+			else i++;
 		}
 		return scenarios.get(i);
 	}
 
+	// retourne le programme recherché
 	Object[] getProgramme(Object chaine){
 		int i = 0;
 		boolean trouve = false;
@@ -199,28 +223,40 @@ action code {:
 		return programmations.get(i);
    }
 
-   // ---------------association---------------
+   // --------------- partie association ---------------
 
+	// ajoute un scenario à une interface
 	void ajoutScenarInterface(Object inter, Object scenar){
 		int i = 0;
 		boolean trouve = false;
+		// parcours de la liste interface
 		while(i < interfaces.size() && !trouve){
-			if(interfaces.get(i)[0].equals(inter.toString())){			
+			// s'il s'agit de l'interface
+			if(interfaces.get(i)[0].equals(inter.toString())){
+				// ajout du scenario à l'interface			
 				((List<Object>) interfaces.get(i)[3]).add(scenar.toString());
+				// on precise que l'interface à un scénario attribué
 				if(!(Boolean)interfaces.get(i)[1])interfaces.get(i)[1] = true;
-				getScenario(scenar)[1] = true;
+				//getScenario(scenar)[1] = true;
 				trouve = true;
 			}
 			i++;	
 		}
 	}
 
+	// ajoute une interface et son scenario à la liste d'associations
 	void Association_simple(Object i, Object s){
+		// si l'interface existe
 		if(interfaceExiste(i)){
+			// si l'interface n'a pas de scenario attribué
 			if(!(Boolean)getInterface(i)[1]){
+				// si le scenario existe
 				if(scenarioExiste(s)){
+					// ajoute du scenario à l'interface
 					ajoutScenarInterface(i,s);
+					// ajout de l'interface à la liste d'associations
 					associations.add(new Object[] {(String)i, new ArrayList<Object>()});
+					// attribution du scenario à l'interface qui vient d'être ajoutée
 					((List<Object>) associations.get(associations.size()-1)[1]).add(s.toString());
 				}else{
 					sortie_erreur += "Erreur ligne " + parser.pline() + ": scenario "+s+" inexistant.\n";
@@ -233,16 +269,26 @@ action code {:
 		}
 	}
 
+	// ajoute une interface et ses scenarii à la liste d'associations
 	void Association_multiple(Object i){
+		// si l'interface existe
 		if(interfaceExiste(i)){
+			// si l'interface n'a pas de scenario attribué
 			if(!(Boolean)getInterface(i)[1]){
+				// si l'interface n'est pas un interrupteur (unique interface ne pouvant accueillir plusieurs sénarios)
 				if(!(((String)getInterface(i)[2]).equals("interrupteur"))){
+					// si la liste de scenarii de l'interface n'est pas vide
 					if(liste_association_scenarios != null){
 						int j;
-						for(j=0; j<liste_association_scenarios.size();j++){	
+						// parcours de la liste de scenarii de l'interface
+						for(j=0; j<liste_association_scenarios.size();j++){
+							// si le scénario existe	
 							if(scenarioExiste(liste_association_scenarios.get(j))){
+								// ajoute du scenario à l'interface
 								ajoutScenarInterface(i,liste_association_scenarios.get(j));
+								// ajout de l'interface à la liste d'associations (une seule fois)
 								if(j==0) associations.add(new Object[] {(String)i, new ArrayList<Object>()});
+								// attribution du scenario à l'interface qui vient d'être ajoutée
 								((List<Object>) associations.get(associations.size()-1)[1]).add(liste_association_scenarios.get(j));
 							}else{
 								sortie_erreur += "\nerreur :: scenario "+liste_association_scenarios.get(j)+" inexistant.\n";
@@ -260,9 +306,11 @@ action code {:
 		}else{
 			sortie_erreur += "Erreur ligne " + parser.pline() + ": interface "+i+" inexistante.\n";	
 		}
+		// on vide la liste des scenarii pour les suivants
 		liste_association_scenarios.clear();
 	}
 	
+	// affichage du tableau associations
 	String associationToString(){
 		String retour = "\n---- association ----\n";
 		for(int i=0;i<associations.size();i++){
@@ -273,34 +321,42 @@ action code {:
 
    // ---------------programme---------------
 
+	// ajoute une date à un programme
 	void ajouterDateProgramme(Object s, int[] date){
 		int i = 0;
 		boolean trouve = false;
+		// parcours de la liste programmations pour trouver le bon programme
 		while(i < programmations.size() && !trouve){
-			if(programmations.get(i)[0].equals(s.toString())){			
+			if(programmations.get(i)[0].equals(s.toString())){	
+				// ajout de la date		
 				((ArrayList)programmations.get(i)[2]).add(date);
 				trouve = true;
 			}
 			i++;	
 		}
 	}
-
+	
+	// ajoute une date à un programme et met à jour sa récurence (si la date possède "_")
 	void ajouterDateProgramme(Object s, int[] date, boolean recurrence){
 		int i = 0;
 		boolean trouve = false;
 		boolean doublon;
+		// parcours de la liste programmations pour trouver le bon programme
 		while(i < programmations.size() && !trouve){
 			if(programmations.get(i)[0].equals(s.toString())){	
 				ArrayList<Object> temporaire = ((ArrayList)programmations.get(i)[2]);
 				doublon = false;
+				// vérification si la date est déjà programmé ou non
 				for(int j=0;j<temporaire.size();j++){
 					int[] date_temp = (int[])temporaire.get(j);
 					if(date[0] == date_temp[0] && date[1] == date_temp[1] && date[2] == date_temp[2] && date[3] == date_temp[3] && date[4] == date_temp[4]){
 						doublon = true;
 					}
 				}
+				// ajout de la date uniquement si la date n'est pas déjà programmé
 				if(!doublon){
 					((ArrayList)programmations.get(i)[2]).add(date);
+					// mise à jour de la reccurence
 					if(recurrence) programmations.get(i)[1] = recurrence; 
 				}else{
 					sortie_erreur += "Erreur ligne " + parser.pline() + ": doublon de date de la programmation du scenario "+s+".\n";
@@ -311,7 +367,9 @@ action code {:
 		}
 }
 
+	// vérification de la date et retour de la date dans un tableau d'entier
 	int[] Date(Object d, Object s){
+		// variables de test
 		String date = (String) d;
 		int annee = 0;
 		int mois = 0;
@@ -321,37 +379,46 @@ action code {:
 		int annee_courante = Calendar.getInstance().get(Calendar.YEAR);
 		int mois_courant = 0;
 		boolean reccurence = false;
+		// décomposition de la date
 		String[] date_compose = date.split(",");
 		int[] date_valide = new int[5];
+		// on vérifie si la date est bien complète année, mois, jour, heure, minutes
 		if(date_compose.length != 5){
 			sortie_erreur += "Erreur ligne " + parser.pline() + ": date de la programmation du scenario "+s+" incorrect. nombre de paramêtre invalide.\n";
 			return null;
 		}
+			
+		// vérifications de annee, mois, jour, heure, minutes
 		// annee
+		// si l'annee possède de la recurrence
 		if(date_compose[0].equals("_")){
 			date_valide[0] = -1;
 			reccurence = true;
 		}else{
 			try{
 				annee = Integer.parseInt(date_compose[0]);
+				// une annee pour être valide doit être supérieure ou égale à l'année courante
 				if(annee >= annee_courante){
 					date_valide[0] = annee;
 				}else{
 					sortie_erreur += "Erreur ligne " + parser.pline() + ": date de la programmation du scenario "+s+" incorrect. année invalide(inférieure à "+annee_courante+").\n";
 					return null;
 				}
+			// en cas d'erreur du parse
 			}catch(Exception e){
 				sortie_erreur += "Erreur ligne " + parser.pline() + ": date de la programmation du scenario "+s+" incorrect. année invalide.\n";
 				return null;
 			}
 		}
 		// mois
+		// si le mois possède de la recurrence
 		if(date_compose[1].equals("_")){
 			date_valide[1] = -1;	//
 			reccurence = true;
 		}else{
 			try{
 				mois = Integer.parseInt(date_compose[1]);
+				// si l'annee correspond à l'année courante le mois doit être supérieur ou égal au mois courant
 				if(date_valide[0] != -1 && annee == annee_courante){
 					Calendar cal = Calendar.getInstance();
 					cal.set(Calendar.YEAR, annee);
@@ -362,18 +429,21 @@ action code {:
 						sortie_erreur += "Erreur ligne " + parser.pline() + ": date de la programmation du scenario "+s+" incorrect. mois invalide.\n";
 						return null;
 					}
+				// sinon le mois doit être en 1 et 12
 				}else if(mois <= 12 && mois >= 1 && date_valide[0] != -1){
 					date_valide[1] = mois;
 				}else{
 					sortie_erreur += "Erreur ligne " + parser.pline() + ": date de la programmation du scenario "+s+" incorrect. mois invalide.\n";
 					return null;
 				}
+			// en cas d'erreur du parse
 			}catch(Exception e){
 				sortie_erreur += "Erreur ligne " + parser.pline() + ": date de la programmation du scenario "+s+" incorrect. mois invalide.\n";
 				return null;
 			}
 		}
 		//jour
+		// si le jour possède de la recurrence
 		if(date_compose[2].equals("_")){
 			date_valide[2] = -1;
 			reccurence = true;
@@ -386,7 +456,8 @@ action code {:
 				}else{
 					cal.set(Calendar.YEAR, annee_courante);
 				}
-				
+				// si l'annee correspond à l'année courante, le mois au mois courant le jour doit être supérieur ou égal au jour courant
+				// sinon il doit être entre 1 et 31 
 				if(date_valide[1] != -1){
 					cal.set(Calendar.MONTH, mois);
 					int maxjour = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -412,42 +483,49 @@ action code {:
 						return null;
 					}
 				}
+			// en cas d'erreur du parse
 			}catch(Exception e){
 				sortie_erreur += "\nerreur :: date de la programmation du scenario "+s+" incorrect. jour invalide.";
 				return null;
 			}
 		}
 		//heure
+		// si l'heure possède de la recurrence
 		if(date_compose[3].equals("_")){
 			date_valide[3] = -1;
 			reccurence = true;
 		}else{
 			try{
 				heure = Integer.parseInt(date_compose[3]);
+				// une heure est comprise entre 0 et 23
 				if(heure >= 0 && heure < 24){
 					date_valide[3] = heure;
 				}else{
 					sortie_erreur += "Erreur ligne " + parser.pline() + " : date de la programmation du scenario "+s+" incorrect. heure invalide.\n";
 					return null;
 				}
+			// en cas d'erreur du parse
 			}catch(Exception e){
 				sortie_erreur += "Erreur ligne " + parser.pline() + " : date de la programmation du scenario "+s+" incorrect. heure invalide.\n";
 				return null;
 			}
 		}
 		//minutes
+		// si les minutes possèdent de la recurrence
 		if(date_compose[4].equals("_")){
 			date_valide[4] = -1;
 			reccurence = true;
 		}else{
 			try{
 				minutes = Integer.parseInt(date_compose[4]);
+				// les minutes sont compris entre 0 et 59
 				if(minutes >= 0 && minutes < 60){
 					date_valide[4] = minutes;
 				}else{
 					sortie_erreur += "Erreur ligne " + parser.pline() + " : date de la programmation du scenario "+s+" incorrect. minutes invalide.\n";
 					return null;
 				}
+			// en cas d'erreur du parse
 			}catch(Exception e){
 				sortie_erreur += "Erreur ligne " + parser.pline() + " : date de la programmation du scenario "+s+" incorrect. minutes invalide.\n";
 				return null;
@@ -456,20 +534,28 @@ action code {:
 		return date_valide;
 	}	
 
+	// programme un scénario à une date, ajoute le programme dans la liste programmations
 	void programmer(Object s, Object d){
+		// si le scenario existe
 		if(scenarioExiste(s)){
+			// si le programme n'existe pas
 			if(!programmeExiste(s)){
+				// récuperation et vérifacation de la date dans un tableau d'entiers
 				int[] date = Date(d, s);
+				// si la date n'est pas null
 				if(date != null){
 					int i = 0;
 					boolean recurent = false;
+					// vérification de la réccurence de la date
 					while(i<date.length && !recurent){
 						if(date[i] == -1){
 							recurent = true;
 						}
 						i++;
 					}
+					// ajout du programme à la liste programmations
 					programmations.add(new Object[] {(String)s, recurent, new ArrayList<Object>()});
+					// ajout de la date au programme qui vient d'être ajouté
 					ajouterDateProgramme(s, date);			
 				}
 			}else{
@@ -477,12 +563,14 @@ action code {:
 				if(date != null){
 					int i = 0;
 					boolean recurent = false;
+					// vérification de la réccurence de la date
 					while(i<date.length && !recurent){
 						if(date[i] == -1){
 							recurent = true;
 						}
 						i++;
 					}
+					// ajout de la date au programme qui correspond au scénario
 					ajouterDateProgramme(s, date, recurent);			
 				}
 			}
@@ -491,6 +579,7 @@ action code {:
 		}
 	}
 
+	// affiche la liste programmations
 	String programmationToString(){
 		String retour = "\n---- programmations ----\n";
 		for(int i=0;i<programmations.size();i++){
@@ -535,18 +624,18 @@ ini ::= DEBUT_DOMUS declaration FIN_DOMUS {:
 	if(code_valide) {
 		System.out.println("Liste des appareils :");
 		for(Object[] tab : appareils) {
-			System.out.println("- nom : " + tab[0] + " | utilise : " + tab[1] + " | type : " + tab[2]);
+			System.out.println("- nom : " + tab[0] + " | utilise : " + tab[1] + " | type : " + tab[2]);
 		}
 
 		System.out.println("\n\nListe des enumérations d'appareils :");
 		for(Object[] tab1 : enums_appareils) {
-			System.out.println("- nom : " + tab1[0] + " | son type est " + tab1[1] + " | ses valeurs sont : " + tab1[2]);
+			System.out.println("- nom : " + tab1[0] + " | son type est " + tab1[1] + " | ses valeurs sont : " + tab1[2]);
 		}
 
 		System.out.println("\nListe des interfaces :");
 		for(Object[] tab2 : interfaces) {
-			System.out.println("\n- nom : " + tab2[0] + " | utilise : " + tab2[1] 
-			+ " | type : " + tab2[2] + " | ses scénarios sont : " + tab2[3]);
+			System.out.println("\n- nom : " + tab2[0] + " | utilise : " + tab2[1] 
+			+ " | type : " + tab2[2] + " | ses scénarios sont : " + tab2[3]);
 		}
 
 		System.out.println("\nListe des scenarios : ");
@@ -564,7 +653,7 @@ declaration ::= DEBUT_APPAREIL liste_appareil  FIN_APPAREIL DEBUT_INTERFACES lis
 
 // ---------------------------DECLARATION APPAREIL---------------------------------------
 
-liste_appareil ::= liste_appareil appareil | appareil | enum_appareil | liste_appareil enum_appareil;
+liste_appareil ::= liste_appareil appareil | appareil | enum_appareil | liste_appareil enum_appareil;
 
 appareil ::= APPAREIL:t liste_identifiant_appareil POINT {:
 	for(Object s : temp) {
@@ -668,7 +757,7 @@ appel_fonction ::= IDENTIFICATEUR:i POINT fonction POINT_VIRGULE {:
 	vider_tampon();
 :};
 
-fonction ::= fonction_valide | fonction_invalide;
+fonction ::= fonction_valide | fonction_invalide;
 
 fonction_valide ::= FONCTION_ETAT:f {: temp.add(f); :};
 
@@ -704,7 +793,7 @@ boucle ::= POURTOUT IDENTIFICATEUR:a {: temp.add(a); :} PARCOURS entree FAIRE in
 		supprimer_appareil(a.toString());
 :};
 
-entree ::= entree_appar | entree_ident;
+entree ::= entree_appar | entree_ident;
 
 entree_appar ::= APPAREIL:a {: if (d.typeAppareilExiste(a)) {
 		appareils.add(new Object[] {temp.get(0), false, a.toString()});
@@ -799,3 +888,4 @@ liste_date_programmer ::= liste_date_programmer VIRGULE PAROUVRE DATE:d PARFERME
 		code_valide = false;
 	}
 :};
+
