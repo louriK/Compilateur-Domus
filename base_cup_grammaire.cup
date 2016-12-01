@@ -1,0 +1,213 @@
+// Specification JCup
+import java_cup.runtime.*;
+import java.util.*;
+import java.io.*;
+
+parser code {:
+	public static void main(String args[]) throws Exception {
+		new parser(new Yylex(System.in)).parse();
+	}
+	/*	
+	public int pline(){
+		return ((Yylex)getScanner()).getYyLine();
+	}
+	public int pcolumn(){
+		return ((Yylex)getScanner()).getYyColumn();
+	}
+	public String ptext(){
+		return ((Yylex)getScanner()).getYyText();
+	}
+	*/
+:}
+
+action code {:
+   List<Object[]> appareils = new ArrayList<Object[]>();
+   List<Object[]> interfaces= new ArrayList<Object[]>();
+   List<Object[]> scenarios = new ArrayList<Object[]>();
+   List<Object[]> associations = new ArrayList<Object[]>();
+   List<Object[]> programmations = new ArrayList<Object[]>();
+   List<Object[]> enums_appareils= new ArrayList<Object[]>();
+   List<Object[]> enums_dates= new ArrayList<Object[]>();
+
+   List<Object> temp = new ArrayList<Object>();
+   String sortie_erreur = "";
+   boolean code_valide = true;
+
+   class Dico {
+      String [][] fonctions = new String [6][];
+      String [][] etats = new String [6][];
+
+      {
+         // 0 = eclairage, 1 = alarme, 2 = chauffage, 3 = fenetre, 4 = volet, 5 = autre_appareil
+         fonctions[0] = new String[] {"eclairage", "allumer", "eteindre", "tamiser"};
+         fonctions[1] = new String[] {"alarme", "allumer", "allumer_partiel", "éteindre"};
+         fonctions[2] = new String[] {"chauffage", "allumer_eco", "éteindre"};
+         fonctions[3] = new String[] {"fenetre", "ouvrir", "ouvrir_partiel", "fermer", "fermer_partiel"};
+         fonctions[4] = new String[] {"volet", "ouvrir", "ouvrir_partiel", "fermer", "fermer_partiel"};
+         fonctions[5] = new String[] {"autre_appareil", "allumer", "éteindre"};
+
+         
+         // 0 = eclairage, 1 = alarme, 2 = chauffage, 3 = fenetre, 4 = volet, 5 = autre_appareil
+         etats[0] = new String[] {"allumé", "éteint", "demi"};
+         etats[1] = new String[] {"allumé", "eteint", "demi"};
+         etats[2] = new String[] {"allumé", "eteint", "éco"};
+         etats[3] = new String[] {"ouvert", "fermé", "demi"};
+         etats[4] = new String[] {"ouvert", "fermé", "demi"};
+         etats[5] = new String[] {"allumé", "eteint"};
+      }
+
+      public boolean getFonctions(String appareil, String fonc){
+         int i  = 0;
+         while(i < fonctions.length) {
+            if(fonctions[i][0].equals(appareil)) {
+               for(int j = 1; j < fonctions[i].length; j++) if(fonctions[i][j].equals(fonc)) return true;
+            } else i++;
+         }
+         return false;
+      }
+   }
+   Dico d = new Dico();
+
+   void exemple_de_fonction(String i1, String i2)
+   {
+	   String m = "Erreur syntaxique <"+i2+"> au lieu de <"+i1+">";
+	   if (!(i1.equals(i2))) parser.report_error(m,null);	 
+   }
+
+   void vider_tampon() {
+      temp.clear();
+   }
+
+   boolean appareilExiste(Object chaine){
+      int i  = 0;
+      boolean trouve = false;
+      while(i < appareils.size() && !trouve) {
+         if(appareils.get(i)[0].equals(chaine.toString())) { trouve = true;}
+         else i++;
+      }
+      return trouve;
+   }
+
+   boolean enumAppareilExiste(Object chaine){
+      int i  = 0;
+      boolean trouve = false;
+      while(i < enums_appareils.size() && !trouve) {
+         if(enums_appareils.get(i)[0].equals(chaine.toString())) { trouve = true;}
+         else i++;
+      }
+      return trouve;
+   }
+
+   boolean interfaceExiste(Object chaine){
+      int i  = 0;
+      boolean trouve = false;
+      while(i < interfaces.size() && !trouve) {
+         if(interfaces.get(i)[0].equals(chaine.toString())) { trouve = true;}
+         else i++;
+      }
+      return trouve;
+   }
+
+   boolean ScenarioExiste(Object chaine){
+	  	int i  = 0;
+	  	while(i < scenarios.size()) {
+	     		if(scenarios.get(i)[0].equals(chaine.toString())) { return true;}
+	  	}
+	  	return false;
+   }
+
+:}
+
+terminal DEBUT_DOMUS, FIN_DOMUS, DEBUT_APPAREIL, FIN_APPAREIL, DEBUT_INTERFACES, FIN_INTERFACES, DEBUT_SCENARII, FIN_SCENARII, DEBUT_COMMANDES, FIN_COMMANDES, APPAREIL, POINT, VIRGULE, IDENTIFICATEUR, ENUM, ASSIGNATION,  PAROUVRE, PARFERME, INTERFACE, DEBUT_SCENARIO, FIN_SCENARIO, FONCTION_ETAT, POINT_VIRGULE, EXECUTER_SCENARIO, MESSAGE, TEXTE, POURTOUT, PARCOURS, FAIRE, FAIT, SI, ALORS, SINON, FINSI, ASSOCIER, PROGRAMMER, DATE, ACFERME, ETAT, ACOUVRE, OPERATEUR, FIN_DE_BALISE;
+
+non terminal ini, declaration,
+liste_appareil, liste_identifiant_appareil, identifiant_appareil, liste_identifiant_appareil_enum, identifiant_appareil_enum, enum_appareil, appareil,
+liste_interface, interface, identifiant_interface, liste_identifiant_interface,
+scenarii, scenario, appel_fonction, instruction, liste_instructions, execution, affichage, liste_elemts, elem, boucle, condition, test, entree, entree_appar, entree_ident, valeur, 
+liste_commande,  commande, associer, liste_associer, liste_identifiant_associer, programmer, liste_date, liste_date_programmer;
+
+ini ::= DEBUT_DOMUS declaration FIN_DOMUS;
+
+declaration ::= DEBUT_APPAREIL liste_appareil  FIN_APPAREIL DEBUT_INTERFACES liste_interface FIN_INTERFACES DEBUT_SCENARII scenarii FIN_SCENARII DEBUT_COMMANDES liste_commande FIN_COMMANDES;
+
+// ---------------------------DECLARATION APPAREIL---------------------------------------
+
+liste_appareil ::= liste_appareil appareil | appareil | enum_appareil | liste_appareil enum_appareil;
+
+appareil ::= APPAREIL:t liste_identifiant_appareil POINT;
+
+liste_identifiant_appareil ::= liste_identifiant_appareil VIRGULE identifiant_appareil | identifiant_appareil;
+
+identifiant_appareil ::= IDENTIFICATEUR;
+
+// ------GESTION DES ENUMS ------
+
+enum_appareil ::= ENUM IDENTIFICATEUR:e ASSIGNATION ACOUVRE liste_identifiant_appareil_enum ACFERME POINT;
+
+liste_identifiant_appareil_enum  ::= liste_identifiant_appareil_enum VIRGULE identifiant_appareil_enum | identifiant_appareil_enum;
+
+identifiant_appareil_enum ::= IDENTIFICATEUR;
+
+// ---------------------------DECLARATION INTERFACE---------------------------------------
+
+liste_interface ::= liste_interface interface | interface;
+
+interface ::= INTERFACE:t liste_identifiant_interface POINT;
+
+liste_identifiant_interface ::= liste_identifiant_interface VIRGULE identifiant_interface| identifiant_interface;
+
+identifiant_interface ::= IDENTIFICATEUR;
+
+// ---------------------------DECLARATION SCENARII---------------------------------------
+
+scenarii ::= scenarii DEBUT_SCENARIO IDENTIFICATEUR FIN_DE_BALISE scenario FIN_SCENARIO IDENTIFICATEUR FIN_DE_BALISE |DEBUT_SCENARIO IDENTIFICATEUR FIN_DE_BALISE scenario FIN_SCENARIO IDENTIFICATEUR FIN_DE_BALISE;
+
+// ---------------------------DECLARATION SCENARIO---------------------------------------
+
+scenario ::= scenario:d instruction | instruction;
+
+instruction ::= condition | affichage | execution | boucle | appel_fonction;
+
+appel_fonction ::= IDENTIFICATEUR:i POINT FONCTION_ETAT:f POINT_VIRGULE;
+
+execution ::= EXECUTER_SCENARIO IDENTIFICATEUR:s POINT_VIRGULE;
+
+affichage ::= MESSAGE PAROUVRE liste_elemts PARFERME POINT_VIRGULE;
+
+liste_elemts ::= liste_elemts VIRGULE elem | elem;
+
+elem ::= TEXTE | IDENTIFICATEUR;
+
+boucle ::= POURTOUT IDENTIFICATEUR PARCOURS entree FAIRE instruction FAIT POINT_VIRGULE;
+
+entree ::= entree_appar | entree_ident;
+
+entree_appar ::= APPAREIL;
+
+entree_ident ::= IDENTIFICATEUR;
+
+condition ::= SI test ALORS liste_instructions FINSI POINT_VIRGULE | SI test ALORS liste_instructions SINON liste_instructions FINSI POINT_VIRGULE;
+
+test ::= PAROUVRE valeur OPERATEUR valeur PARFERME;
+
+valeur ::= IDENTIFICATEUR POINT FONCTION_ETAT | ETAT;
+
+liste_instructions ::= liste_instructions VIRGULE instruction | instruction;
+
+// ---------------------------DECLARATION COMMANDE---------------------------------------
+
+liste_commande ::= liste_commande commande | commande;
+
+commande ::= associer | programmer;
+
+associer ::= ASSOCIER IDENTIFICATEUR ASSIGNATION liste_associer POINT | ASSOCIER IDENTIFICATEUR ASSIGNATION IDENTIFICATEUR POINT;
+
+liste_associer ::= ACOUVRE liste_identifiant_associer ACFERME;
+
+liste_identifiant_associer ::= liste_identifiant_associer VIRGULE IDENTIFICATEUR | IDENTIFICATEUR;
+
+programmer ::= PROGRAMMER IDENTIFICATEUR ASSIGNATION liste_date POINT | PROGRAMMER IDENTIFICATEUR ASSIGNATION PAROUVRE DATE PARFERME POINT;
+
+liste_date ::= ACOUVRE liste_date_programmer ACFERME;
+
+liste_date_programmer ::= liste_date_programmer VIRGULE PAROUVRE DATE PARFERME | PAROUVRE DATE PARFERME;
