@@ -1,0 +1,76 @@
+	String resumeProgDomotique(){
+		String retour = "--- Resumé du Programme domotique ---\n";
+		retour += "+ nombre de d'appareils déclarés : "+appareils.size()+"\n";
+		retour += "+ nombre de d'énumeration d'appareils déclarés : "+enums_appareils.size()+"\n";
+		retour += "+ nombre de d'interfaces déclarées : "+interfaces.size()+"\n";	
+		retour += "+ nombre de scenarri déclarés : "+scenarios.size()+"\n";
+		retour += "+ associations (interface -> scenarii) \n";
+		for(int i=0; i<associations.size();i++){
+			retour += "\t- "+(String)associations.get(i)[0]+ " -> ";
+			for(int j=0; j<((List<Object[]>)associations.get(i)[1]).size();j++){
+				retour += ((List<Object[]>)associations.get(i)[1]).get(j);
+				if(j != ((List<Object[]>)associations.get(i)[1]).size()-1){
+					retour += ",";
+				}
+			}
+			retour += "\n";
+		}
+		retour += visionChronologique();
+		return retour;
+	}
+
+	String visionChronologique(){
+		List<ArrayList> chronologieProgrammation =  new ArrayList<ArrayList>();
+		for(int i=0; i<programmations.size();i++){
+			ArrayList<Object> temporaire = ((ArrayList)programmations.get(i)[2]);
+			for(int j=0; j<temporaire.size();j++){
+				int[] date_temp = (int[])temporaire.get(j);
+				ArrayList<Object> tuple = new ArrayList<Object>();
+				tuple.add((String)programmations.get(i)[0]);
+				tuple.add(date_temp);
+				if(chronologieProgrammation.isEmpty()){
+					chronologieProgrammation.add(tuple);
+				}else{
+					boolean insere = false;
+					int k=0;
+					while(k<chronologieProgrammation.size() && !insere){
+						int[] date_test = (int[]) chronologieProgrammation.get(k).get(1);
+						if(date_test[0] > date_temp[0]){
+							chronologieProgrammation.add(k, tuple);
+							insere = true;
+						}else if(date_test[0] == date_temp[0]){
+							if(date_test[1] > date_temp[1]){
+								chronologieProgrammation.add(k, tuple);
+								insere = true;
+							}else if(date_test[1] == date_temp[1]){
+								if(date_test[2] > date_temp[2]){
+									chronologieProgrammation.add(k, tuple);
+									insere = true;
+								}else if(date_test[2] == date_temp[2]){
+									if(date_test[3] > date_temp[3]){
+										chronologieProgrammation.add(k, tuple);
+										insere = true;
+									}else if(date_test[3] == date_temp[3]){
+										if(date_test[4] > date_temp[4]){
+											chronologieProgrammation.add(k, tuple);
+											insere = true;
+										}
+									}
+								}
+							}
+						}
+						k++;
+					}
+					if(!insere){
+						chronologieProgrammation.add(tuple);
+					}
+				}
+			}
+		 }
+		String retour = "+ chronologie des scénarios programmés\n";
+		for(int i=0; i<chronologieProgrammation.size();i++){
+			int[] date_affiche = (int[]) chronologieProgrammation.get(i).get(1);
+			retour += "\t- "+chronologieProgrammation.get(i).get(0)+" - ["+date_affiche[0]+","+date_affiche[1]+","+date_affiche[2]+","+date_affiche[3]+","+date_affiche[4]+"]\n";
+		}
+		return retour;
+	}
