@@ -759,6 +759,10 @@ scenario ::= DEBUT_SCENARIO IDENTIFICATEUR:n {: nom_scenario = n.toString(); :} 
       sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur de la balise de fin du scenario ne correspond pas à celui de la balise de début (" + nom_scenario + " != " + m.toString() + ").\n";
 		code_valide = false;
    }
+:}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
 :};
 
 instructions_scenario ::= instructions_scenario instruction | instruction;
@@ -786,6 +790,10 @@ appel_fonction ::= IDENTIFICATEUR:i POINT fonction POINT_VIRGULE {:
 		code_valide = false;
 	}
 	vider_tampon();
+:}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
 :};
 
 // fonction invalide = fonction non enregristrée 
@@ -793,7 +801,11 @@ fonction ::= fonction_valide | fonction_invalide;
 
 fonction_valide ::= FONCTION_ETAT:f {: temp.add(f); :};
 
-fonction_invalide ::= IDENTIFICATEUR:f {: temp.add(f); :};
+fonction_invalide ::= IDENTIFICATEUR:f {: temp.add(f); :}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
+:};
 
 execution ::= EXECUTER_SCENARIO IDENTIFICATEUR:s POINT_VIRGULE {: 
 	if (scenarioExiste(s))
@@ -805,6 +817,10 @@ execution ::= EXECUTER_SCENARIO IDENTIFICATEUR:s POINT_VIRGULE {:
 		sortie_erreur += "Erreur ligne " + parser.pline() + " : scénario inexistant, scenario non lancé (" + s + ").\n";
 		code_valide = false;
 	}
+:}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
 :};
 
 // affichage d'un message 
@@ -821,11 +837,19 @@ elem ::= TEXTE | IDENTIFICATEUR:s {: if (appareilExiste(s))
 		sortie_erreur += "Erreur ligne " + parser.pline() + " : appareil inexistant, scenario non lancé (" + s.toString() + ").\n";
 		code_valide = false; 
 	}
-:} | IDENTIFICATEUR POINT FONCTION_ETAT | TEXTE_INVALIDE |  ;
+:} | IDENTIFICATEUR POINT FONCTION_ETAT | TEXTE_INVALIDE | error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
+:}| ;
 
 // = Poutout
 boucle ::= POURTOUT IDENTIFICATEUR:a {:  temp.add(a); :} PARCOURS entree FAIRE liste_instructions FAIT POINT_VIRGULE {: 
 		supprimer_appareil(a.toString());
+:}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
 :};
 
 entree ::= entree_appar | entree_ident;
@@ -856,6 +880,10 @@ entree_ident ::= IDENTIFICATEUR:a {: if (enumAppareilExiste(a)) {
 		code_valide = false;
       vider_tampon();
 	}
+:}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
 :};
 
 // Si/Sinon
@@ -870,7 +898,11 @@ condition_sinon ::= SI test ALORS liste_instructions SINON liste_instructions FI
 test ::= PAROUVRE valeur OPERATEUR valeur PARFERME;
 
 // valeur = une fonction d'un appareil OU son état 
-valeur ::= IDENTIFICATEUR POINT FONCTION_ETAT | ETAT;
+valeur ::= IDENTIFICATEUR POINT FONCTION_ETAT | ETAT| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
+:};
 // ---------------------------DECLARATION COMMANDE---------------------------------------
 //Définition de la structure des commandes
 liste_commande ::= liste_commande commande | commande ;
@@ -883,6 +915,10 @@ associer ::= ASSOCIER IDENTIFICATEUR:i ASSIGNATION liste_associer POINT {:
 	Association_multiple(i);
 :} | ASSOCIER IDENTIFICATEUR:i ASSIGNATION IDENTIFICATEUR:s POINT {: 
 	Association_simple(i, s);
+:}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
 :};
 
 liste_associer ::= ACOUVRE liste_identifiant_associer ACFERME;
@@ -902,6 +938,10 @@ liste_identifiant_associer ::= liste_identifiant_associer VIRGULE IDENTIFICATEUR
 		sortie_erreur += "\nErreur ligne " + parser.pline() + " : scenario "+s+" déjà présent dans l'énumération de scénarios.\n";	
 		code_valide = false;
 	}
+:}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
 :};
 
 //partie programmation (dates) - définition
@@ -914,6 +954,10 @@ programmer ::= PROGRAMMER IDENTIFICATEUR:s ASSIGNATION liste_date POINT
 	liste_programme_date.clear();
 :} | PROGRAMMER IDENTIFICATEUR:s ASSIGNATION PAROUVRE DATE:d PARFERME POINT {: 
 	programmer(s,d);
+:}| error 
+{:
+	sortie_erreur += "Erreur ligne " + parser.pline() + " : l'identificateur ne peut pas être un mot clé.\n";
+	code_valide = false;
 :};
 
 liste_date ::= ACOUVRE liste_date_programmer ACFERME;
