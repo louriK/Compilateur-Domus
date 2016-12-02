@@ -21,7 +21,8 @@ import java_cup.runtime.Symbol;
 
 // qqs exemples de macros...
 chiffre = [0-9]
-identificateur = [a-zA-Z0-9_]+
+identificateur = [a-zA-Z_][a-zA-Z0-9_]*
+identificateur_invalide = [0-9]+[a-zA-Z0-9_]+
 annee = {chiffre}{chiffre}{chiffre}{chiffre}|\_
 mois = {chiffre}{chiffre}|{chiffre}|\_
 jour = {chiffre}{chiffre}|{chiffre}|\_
@@ -32,13 +33,13 @@ autre_appareil = tv|hifi|cafetiere|video_proj|lave_vaisselle|lave_linge|seche_li
 appareil = eclairage|volet|chauffage|alarme|fenetre|autre\_appareil\({autre_appareil}\)
 interface = interrupteur|mobile|telephone|telecommande|tablette
 operateur = "==" | "!=" | "||" | "&&"
-fonction_etat = etat|ouvrir|fermer|eteindre|allumer|tamiser|etat|allumer_partiel|allumer_eco|ouvrir_partiel|fermer_partiel
-etat = eteint|demi|eco|ouvvert|ferme
+fonction_etat = etat|ouvrir|fermer|eteindre|allumer|tamiser|allumer_partiel|allumer_eco|ouvrir_partiel|fermer_partiel
+etat = eteint|demi|eco|ouvert|ferme|allume
 espace = [\ \b\t]+
 retour_ligne = \n
 commentaire = \/\/ ~\n
 texte = \" ~ \"
-erreur_chaine = \"[^\"\n]*\n  
+erreur_chaine = \"[^\"\n]*(")"|",")  
 
 %%
 // qqs exemples de règles lexicales légales...
@@ -88,8 +89,9 @@ fsi			 	{return new Symbol(sym.FINSI);}
 "."				{return new Symbol(sym.POINT, yytext());}
 ";"				{return new Symbol(sym.POINT_VIRGULE, yytext());} 
 
+{identificateur_invalide} {return new Symbol(sym.IDENTIFICATEUR_INVALIDE, yytext());}
 {identificateur} 	 	{return new Symbol(sym.IDENTIFICATEUR, yytext());}
 
-{erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); }
+{erreur_chaine} {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => fin de chaine attendue ! "); return new Symbol(sym.TEXTE_INVALIDE, yytext()); }
 
 . {System.out.println(" Erreur ligne "+(yyline+1)+" colonne "+(yycolumn+1)+" : "+yytext()+" => caractÃ¨re inconnu ! "); } 
