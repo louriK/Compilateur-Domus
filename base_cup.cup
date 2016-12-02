@@ -840,13 +840,13 @@ test ::= PAROUVRE valeur OPERATEUR valeur PARFERME;
 
 // valeur = une fonction d'un appareil OU son état 
 valeur ::= IDENTIFICATEUR POINT FONCTION_ETAT | ETAT | error {:code_valide=false; :};
-
 // ---------------------------DECLARATION COMMANDE---------------------------------------
-
+//Définition de la structure des commandes
 liste_commande ::= liste_commande commande | commande ;
 
 commande ::= associer | programmer;
 
+//partie association - définition
 associer ::= ASSOCIER IDENTIFICATEUR:i ASSIGNATION liste_associer POINT {:  	
 	System.out.println(liste_association_scenarios.toString());
 	Association_multiple(i);
@@ -856,6 +856,7 @@ associer ::= ASSOCIER IDENTIFICATEUR:i ASSIGNATION liste_associer POINT {:
 
 liste_associer ::= ACOUVRE liste_identifiant_associer ACFERME;
 
+//Vérification de la non-existence d'un scénario lors de son ajout
 liste_identifiant_associer ::= liste_identifiant_associer VIRGULE IDENTIFICATEUR:s {:
 	if(!liste_association_scenarios.contains((String)s)) {
 		liste_association_scenarios.add((String)s);
@@ -872,6 +873,7 @@ liste_identifiant_associer ::= liste_identifiant_associer VIRGULE IDENTIFICATEUR
 	}
 :} | error {:code_valide=false; :};
 
+//partie programmation (dates) - définition
 programmer ::= PROGRAMMER IDENTIFICATEUR:s ASSIGNATION liste_date POINT 
 {: 
 	for(int i=0; i<liste_programme_date.size();i++) {
@@ -885,6 +887,7 @@ programmer ::= PROGRAMMER IDENTIFICATEUR:s ASSIGNATION liste_date POINT
 
 liste_date ::= ACOUVRE liste_date_programmer ACFERME;
 
+//Vérification de la non-existence d'une date lors de son ajout
 liste_date_programmer ::= liste_date_programmer VIRGULE PAROUVRE DATE:d PARFERME {:
 	if(!liste_programme_date.contains(d)) {
 		liste_programme_date.add(d);
